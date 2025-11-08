@@ -1,0 +1,8 @@
+id,name,category,price,create_date
+1,item1,cat1,100,2024-01-01
+2,item2,cat2,200,2024-01-15
+3,item3,cat3,invalid_price,2024-01-20
+4,,cat4,400,2024-01-25
+5,item5,,500,2024-01-30
+6,item6,cat6,600,invalid_date
+1,item1,cat1,100,2024-01-01
