@@ -4,7 +4,7 @@ import (
 	"fmt"
 )
 
-func optionalEnv(key string, defaultValue string) string {
+func OptionalEnv(key string, defaultValue string) string {
 	value, ok := lookupEnv(key)
 	if !ok {
 		value = defaultValue
@@ -13,7 +13,7 @@ func optionalEnv(key string, defaultValue string) string {
 	return value
 }
 
-func requiredEnv(key string) string {
+func RequiredEnv(key string) string {
 	value, ok := lookupEnv(key)
 	if !ok {
 		panic(fmt.Errorf("env.%s is required", key))
