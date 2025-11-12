@@ -5,17 +5,20 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"project_sem/internal/models/price"
 
 	"github.com/spf13/cobra"
 )
 
 const startServerUse = "start-server"
 
-func New(srv *http.Server, rootCtx context.Context) *cobra.Command {
+func New(rootCtx context.Context, srv *http.Server, repo *price.Repository) *cobra.Command {
 	return &cobra.Command{
 		Use:   startServerUse,
 		Short: "Start web-server",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			repo.DeleteAll(rootCtx)
+
 			log.Println("Starting web-server...")
 			go func() {
 				if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {

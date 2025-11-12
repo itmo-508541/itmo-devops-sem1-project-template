@@ -8,8 +8,10 @@ import (
 	"project_sem/internal/app/handlers/load"
 	"project_sem/internal/app/handlers/save"
 	"project_sem/internal/config"
+	"project_sem/internal/models/price"
 	"project_sem/internal/server"
 	"project_sem/internal/server/command/start"
+	"project_sem/internal/services/database"
 	"project_sem/internal/services/general"
 
 	"github.com/sarulabs/di"
@@ -56,7 +58,8 @@ var Services = []di.Def{
 		Name:  SaveHandlerServiceName,
 		Scope: di.App,
 		Build: func(ctn di.Container) (interface{}, error) {
-			handler := save.New()
+			manager := ctn.Get(database.PriceManagerServiceName).(*price.Manager)
+			handler := save.New(manager)
 
 			return handler, nil
 		},
@@ -99,8 +102,9 @@ var Services = []di.Def{
 		Build: func(ctn di.Container) (interface{}, error) {
 			srv := ctn.Get(ServerServiceName).(*http.Server)
 			ctx := ctn.Get(general.ContextServiceName).(context.Context)
+			repo := ctn.Get(database.PriceRepositoryServiceName).(*price.Repository)
 
-			return start.New(srv, ctx), nil
+			return start.New(ctx, srv, repo), nil
 		},
 	},
 }

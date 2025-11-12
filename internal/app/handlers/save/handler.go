@@ -11,10 +11,11 @@ import (
 )
 
 type Handler struct {
+	manager *price.Manager
 }
 
-func New() *Handler {
-	return &Handler{}
+func New(manager *price.Manager) *Handler {
+	return &Handler{manager: manager}
 }
 
 func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -42,8 +43,7 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	var accepted price.AcceptedDTO
 
-	manager := price.NewManager()
-	accepted, err = manager.AcceptCsv(bytes.NewReader(csv))
+	accepted, err = h.manager.AcceptCsv(bytes.NewReader(csv))
 	if err != nil {
 		log.Println(fmt.Errorf("manager.AcceptReader: %w", err))
 		server.JSONInternalServerError(w)

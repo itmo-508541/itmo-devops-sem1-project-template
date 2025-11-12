@@ -5,15 +5,18 @@ import (
 	"project_sem/internal/config"
 	db "project_sem/internal/database"
 	"project_sem/internal/database/command/migrate"
+	"project_sem/internal/models/price"
 	"project_sem/internal/services/general"
 
 	"github.com/sarulabs/di"
 )
 
 const (
-	ConfigServiceName         = "database:config"
-	ConnectionServiceName     = "database:connection"
-	MigrateCommandServiceName = "database:command.migrate"
+	ConfigServiceName          = "database:config"
+	ConnectionServiceName      = "database:connection"
+	MigrateCommandServiceName  = "database:command.migrate"
+	PriceRepositoryServiceName = "database:repository.price"
+	PriceManagerServiceName    = "database:manager.price"
 
 	HostDefault    = "localhost"
 	PortDefault    = "5432"
@@ -62,6 +65,25 @@ var Services = []di.Def{
 			config := ctn.Get(ConfigServiceName).(*Config)
 
 			return migrate.New(config.DataSourceName()), nil
+		},
+	},
+	{
+		Name:  PriceRepositoryServiceName,
+		Scope: di.App,
+		Build: func(ctn di.Container) (interface{}, error) {
+			conn := ctn.Get(ConnectionServiceName).(*db.Database)
+			repository := price.NewRepository(conn)
+
+			return repository, nil
+		},
+	},
+	{
+		Name:  PriceManagerServiceName,
+		Scope: di.App,
+		Build: func(ctn di.Container) (interface{}, error) {
+			manager := price.NewManager()
+
+			return manager, nil
 		},
 	},
 }

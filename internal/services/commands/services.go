@@ -1,4 +1,4 @@
-package application
+package commands
 
 import (
 	"project_sem/internal/services/database"
