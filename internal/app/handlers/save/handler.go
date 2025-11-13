@@ -6,16 +6,19 @@ import (
 	"log"
 	"net/http"
 	"project_sem/internal/models/price"
+	"project_sem/internal/models/report"
 	"project_sem/internal/reader"
 	"project_sem/internal/server"
 )
 
 type Handler struct {
-	manager *price.Manager
+	manager    *price.Manager
+	priceRepo  *price.Repository
+	reportRepo *report.Repository
 }
 
-func New(manager *price.Manager) *Handler {
-	return &Handler{manager: manager}
+func New(m *price.Manager, p *price.Repository, r *report.Repository) *Handler {
+	return &Handler{manager: m, priceRepo: p, reportRepo: r}
 }
 
 func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -35,20 +38,39 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			err = fmt.Errorf("unknown archive type '%s'", fileType)
 		}
 	}
+	if csv[len(csv)-1] != 10 {
+		csv = append(csv, 10)
+	}
+
 	if err != nil {
 		log.Println(fmt.Errorf("Save.ServeHTTP: %w", err))
 		server.JSONBadRequestError(w)
 		return
 	}
 
-	var accepted price.AcceptedDTO
-
-	accepted, err = h.manager.AcceptCsv(r.Context(), bytes.NewReader(csv))
+	accepted, err := h.manager.AcceptCsv(bytes.NewReader(csv))
 	if err != nil {
-		log.Println(fmt.Errorf("manager.AcceptReader: %w", err))
+		log.Println(fmt.Errorf("manager.AcceptCsv: %w", err))
+		server.JSONInternalServerError(w)
+		return
+	}
+	err = h.priceRepo.InsertAll(r.Context(), &accepted.Output)
+	if err != nil {
+		log.Println(fmt.Errorf("priceRepo.InsertAll: %w", err))
+		server.JSONInternalServerError(w)
+		return
+	}
+	result, err := h.reportRepo.Renew(r.Context(), accepted.UUID)
+	if err != nil {
+		log.Println(fmt.Errorf("reportRepo.Renew: %w", err))
 		server.JSONInternalServerError(w)
 		return
 	}
 
-	server.JSONResponse(w, accepted, http.StatusOK)
+	accepted.DuplicatesCount = result.DuplicatesCount
+	accepted.TotalItems = result.TotalItems
+	accepted.TotalCategories = result.TotalCategories
+	accepted.TotalPrice = result.TotalPrice
+
+	server.JSONResponse(w, *accepted, http.StatusOK)
 }

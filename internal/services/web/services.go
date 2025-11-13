@@ -9,6 +9,7 @@ import (
 	"project_sem/internal/app/handlers/save"
 	"project_sem/internal/config"
 	"project_sem/internal/models/price"
+	"project_sem/internal/models/report"
 	"project_sem/internal/server"
 	"project_sem/internal/server/command/start"
 	"project_sem/internal/services/database"
@@ -49,7 +50,8 @@ var Services = []di.Def{
 		Name:  LoadHandlerServiceName,
 		Scope: di.App,
 		Build: func(ctn di.Container) (interface{}, error) {
-			handler := load.New()
+			reportR := ctn.Get(database.ReportRepositoryServiceName).(*report.Repository)
+			handler := load.New(reportR)
 
 			return handler, nil
 		},
@@ -59,7 +61,10 @@ var Services = []di.Def{
 		Scope: di.App,
 		Build: func(ctn di.Container) (interface{}, error) {
 			manager := ctn.Get(database.PriceManagerServiceName).(*price.Manager)
-			handler := save.New(manager)
+			priceR := ctn.Get(database.PriceRepositoryServiceName).(*price.Repository)
+			reportR := ctn.Get(database.ReportRepositoryServiceName).(*report.Repository)
+
+			handler := save.New(manager, priceR, reportR)
 
 			return handler, nil
 		},
@@ -72,14 +77,8 @@ var Services = []di.Def{
 			saveHandler := ctn.Get(SaveHandlerServiceName).(*save.Handler)
 
 			mux := http.NewServeMux()
-			mux.Handle("GET /api/v0/prices", loadHandler)
-			mux.Handle("POST /api/v0/prices", saveHandler)
-
-			mux.Handle("/panic", server.PanicRecoveryMiddleware(
-				func(http.ResponseWriter, *http.Request) {
-					panic("panic to recover")
-				},
-			))
+			mux.Handle("GET /api/v0/prices", server.PanicRecoveryMiddleware(loadHandler))
+			mux.Handle("POST /api/v0/prices", server.PanicRecoveryMiddleware(saveHandler))
 			mux.Handle("/favicon.ico", http.FileServer(http.FS(assets.FaviconFS)))
 			mux.Handle("/", http.FileServer(http.FS(assets.IndexFS)))
 

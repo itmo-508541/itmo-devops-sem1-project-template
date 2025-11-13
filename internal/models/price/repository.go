@@ -27,9 +27,23 @@ func (r *Repository) DeleteAll(parentCtx context.Context) error {
 	return nil
 }
 
-func (r *Repository) Insert(parentCtx context.Context, price *PriceDTO) error {
+func (r *Repository) InsertAll(parentCtx context.Context, prices *[]PriceRecordDTO) error {
+	for _, price := range *prices {
+		err := r.Insert(parentCtx, &price)
+		if err != nil {
+			return fmt.Errorf("Insert: %w", err)
+		}
+	}
+
+	return nil
+}
+
+func (r *Repository) Insert(parentCtx context.Context, price *PriceRecordDTO) error {
+	ctx, cancel := context.WithCancel(parentCtx)
+	defer cancel()
+
 	if _, err := r.db.Exec(
-		parentCtx,
+		ctx,
 		"INSERT INTO prices (group_uuid, uuid, id, name, category, price, create_date) VALUES ($1, $2, $3, $4, $5, $6, $7)",
 		price.GroupUUID.String(),
 		price.UUID.String(),

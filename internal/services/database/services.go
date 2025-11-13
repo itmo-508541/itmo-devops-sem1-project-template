@@ -93,13 +93,8 @@ var Services = []di.Def{
 		Name:  PriceManagerServiceName,
 		Scope: di.App,
 		Build: func(ctn di.Container) (interface{}, error) {
-			ctx := ctn.Get(general.ContextServiceName).(context.Context)
-			repoPrice := ctn.Get(PriceRepositoryServiceName).(*price.Repository)
-			repoReport := ctn.Get(ReportRepositoryServiceName).(*report.Repository)
-
-			manager := price.NewManager(repoReport)
+			manager := price.NewManager()
 			manager.AddProcessor(price.NewValidateProcessor())
-			manager.AddProcessor(price.NewPersistProcessor(ctx, repoPrice))
 
 			return manager, nil
 		},

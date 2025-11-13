@@ -6,11 +6,7 @@ import (
 	"github.com/google/uuid"
 )
 
-type PriceDTO struct {
-	report.ReportDTO
-	GroupUUID uuid.UUID
-}
-
-type AcceptedDTO struct {
-	UUID uuid.UUID `json:"uuid"`
+type PriceRecordDTO struct {
+	report.ReportRecordDTO
+	GroupUUID uuid.UUID `json:"-"`
 }
