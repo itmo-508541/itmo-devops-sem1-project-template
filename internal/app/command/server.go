@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"project_sem/internal/models/price"
+	"project_sem/internal/app/price"
 
 	"github.com/spf13/cobra"
 )

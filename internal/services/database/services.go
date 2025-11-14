@@ -3,10 +3,10 @@ package database
 import (
 	"context"
 	"project_sem/internal/app/command"
+	"project_sem/internal/app/price"
+	"project_sem/internal/app/report"
 	"project_sem/internal/config"
 	db "project_sem/internal/database"
-	"project_sem/internal/models/price"
-	"project_sem/internal/models/report"
 	"project_sem/internal/services/general"
 
 	"github.com/sarulabs/di"

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"project_sem/internal/models/report"
+	"project_sem/internal/app/report"
 	"project_sem/internal/server"
 
 	"github.com/gocarina/gocsv"

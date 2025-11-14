@@ -1,7 +1,7 @@
 package price
 
 import (
-	"project_sem/internal/models/report"
+	"project_sem/internal/app/report"
 
 	"github.com/google/uuid"
 )

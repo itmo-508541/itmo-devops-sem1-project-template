@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"project_sem/internal/models/price"
-	"project_sem/internal/models/report"
+	"project_sem/internal/app/price"
+	"project_sem/internal/app/report"
 	"project_sem/internal/reader"
 	"project_sem/internal/server"
 )
