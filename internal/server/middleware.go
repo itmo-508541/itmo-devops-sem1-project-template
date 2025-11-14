@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-func PanicRecoveryMiddleware(h http.Handler) http.HandlerFunc {
+func PanicRecoveryMiddleware(h http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		defer func() {
 			if rec := recover(); rec != nil {
@@ -16,6 +16,6 @@ func PanicRecoveryMiddleware(h http.Handler) http.HandlerFunc {
 			}
 		}()
 
-		h.ServeHTTP(w, r)
+		h(w, r)
 	}
 }

@@ -5,8 +5,7 @@ import (
 	_ "embed"
 	"net/http"
 	"project_sem/internal/app/assets"
-	"project_sem/internal/app/handlers/load"
-	"project_sem/internal/app/handlers/save"
+	"project_sem/internal/app/handlers"
 	"project_sem/internal/config"
 	"project_sem/internal/models/price"
 	"project_sem/internal/models/report"
@@ -51,7 +50,7 @@ var Services = []di.Def{
 		Scope: di.App,
 		Build: func(ctn di.Container) (interface{}, error) {
 			reportR := ctn.Get(database.ReportRepositoryServiceName).(*report.Repository)
-			handler := load.New(reportR)
+			handler := handlers.NewLoadHandler(reportR)
 
 			return handler, nil
 		},
@@ -64,7 +63,7 @@ var Services = []di.Def{
 			priceR := ctn.Get(database.PriceRepositoryServiceName).(*price.Repository)
 			reportR := ctn.Get(database.ReportRepositoryServiceName).(*report.Repository)
 
-			handler := save.New(manager, priceR, reportR)
+			handler := handlers.NewSaveHandler(manager, priceR, reportR)
 
 			return handler, nil
 		},
@@ -73,8 +72,8 @@ var Services = []di.Def{
 		Name:  ServeMuxServiceName,
 		Scope: di.App,
 		Build: func(ctn di.Container) (interface{}, error) {
-			loadHandler := ctn.Get(LoadHandlerServiceName).(*load.Handler)
-			saveHandler := ctn.Get(SaveHandlerServiceName).(*save.Handler)
+			loadHandler := ctn.Get(LoadHandlerServiceName).(http.HandlerFunc)
+			saveHandler := ctn.Get(SaveHandlerServiceName).(http.HandlerFunc)
 
 			mux := http.NewServeMux()
 			mux.Handle("GET /api/v0/prices", server.PanicRecoveryMiddleware(loadHandler))
