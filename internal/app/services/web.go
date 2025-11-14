@@ -12,6 +12,7 @@ import (
 	"project_sem/internal/app/settings"
 	"project_sem/internal/config"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/sarulabs/di"
 )
 
@@ -47,8 +48,10 @@ var WebServices = []di.Def{
 		Name:  LoadHandlerServiceName,
 		Scope: di.App,
 		Build: func(ctn di.Container) (interface{}, error) {
+			v := ctn.Get(ValidatorServiceName).(*validator.Validate)
 			reportR := ctn.Get(ReportRepositoryServiceName).(*report.Repository)
-			handler := server.NewLoadHandler(reportR)
+
+			handler := server.NewLoadHandler(reportR, v)
 
 			return handler, nil
 		},
@@ -57,11 +60,10 @@ var WebServices = []di.Def{
 		Name:  SaveHandlerServiceName,
 		Scope: di.App,
 		Build: func(ctn di.Container) (interface{}, error) {
-			manager := ctn.Get(PriceManagerServiceName).(*price.Manager)
 			priceR := ctn.Get(PriceRepositoryServiceName).(*price.Repository)
 			reportR := ctn.Get(ReportRepositoryServiceName).(*report.Repository)
 
-			handler := server.NewSaveHandler(manager, priceR, reportR)
+			handler := server.NewSaveHandler(priceR, reportR)
 
 			return handler, nil
 		},

@@ -9,6 +9,7 @@ import (
 	"project_sem/internal/config"
 	"project_sem/internal/database"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/sarulabs/di"
 )
 
@@ -17,7 +18,6 @@ const (
 	ConnectionServiceName       = "database:connection"
 	MigrateCommandServiceName   = "database:command.migrate"
 	PriceRepositoryServiceName  = "database:repository.price"
-	PriceManagerServiceName     = "database:manager.price"
 	ReportRepositoryServiceName = "database:repository.report"
 
 	DatabaseHostDefault    = "localhost"
@@ -74,7 +74,8 @@ var DatabaseServices = []di.Def{
 		Scope: di.App,
 		Build: func(ctn di.Container) (interface{}, error) {
 			conn := ctn.Get(ConnectionServiceName).(*database.Database)
-			repository := price.NewRepository(conn)
+			v := ctn.Get(ValidatorServiceName).(*validator.Validate)
+			repository := price.NewRepository(conn, v)
 
 			return repository, nil
 		},
@@ -87,16 +88,6 @@ var DatabaseServices = []di.Def{
 			repository := report.NewRepository(conn)
 
 			return repository, nil
-		},
-	},
-	{
-		Name:  PriceManagerServiceName,
-		Scope: di.App,
-		Build: func(ctn di.Container) (interface{}, error) {
-			manager := price.NewManager()
-			manager.AddProcessor(price.NewValidateProcessor())
-
-			return manager, nil
 		},
 	},
 }

@@ -10,8 +10,9 @@ import (
 	"project_sem/internal/reader"
 )
 
-func NewSaveHandler(manager *price.Manager, priceRepo *price.Repository, reportRepo *report.Repository) http.HandlerFunc {
+func NewSaveHandler(priceRepo *price.Repository, reportRepo *report.Repository) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		var err error
 		var csv []byte
 
 		fileType := r.URL.Query().Get("type")
@@ -32,26 +33,18 @@ func NewSaveHandler(manager *price.Manager, priceRepo *price.Repository, reportR
 			log.Println(fmt.Errorf("Save.ServeHTTP: %w", err))
 			JSONBadRequestError(w)
 			return
-		}
-
-		if csv[len(csv)-1] != 10 {
+		} else if len(csv) > 0 && csv[len(csv)-1] != 10 {
 			csv = append(csv, 10)
 		}
-		accepted, err := manager.AcceptCsv(bytes.NewReader(csv))
 
+		UUID, totalCount, err := priceRepo.AcceptCsv(r.Context(), bytes.NewReader(csv))
 		if err != nil {
 			err = fmt.Errorf("manager.AcceptCsv: %w", err)
 		}
-		if err != nil {
-			err = priceRepo.InsertAll(r.Context(), &accepted.Output)
-			if err != nil {
-				err = fmt.Errorf("priceRepo.InsertAll: %w", err)
-			}
-		}
 
-		var result *report.Accepted
-		if err != nil {
-			result, err = reportRepo.Renew(r.Context(), accepted.UUID)
+		sr := saveResultDTO{TotalCount: totalCount}
+		if err == nil {
+			sr.DuplicatesCount, sr.TotalItems, sr.TotalCategories, sr.TotalPrice, err = reportRepo.Renew(r.Context(), UUID)
 			if err != nil {
 				err = fmt.Errorf("reportRepo.Renew: %w", err)
 			}
@@ -59,15 +52,9 @@ func NewSaveHandler(manager *price.Manager, priceRepo *price.Repository, reportR
 
 		if err != nil {
 			log.Println(err)
-
 			JSONInternalServerError(w)
 		} else {
-			accepted.DuplicatesCount = result.DuplicatesCount
-			accepted.TotalItems = result.TotalItems
-			accepted.TotalCategories = result.TotalCategories
-			accepted.TotalPrice = result.TotalPrice
-
-			JSONResponse(w, *accepted, http.StatusOK)
+			JSONResponse(w, sr, http.StatusOK)
 		}
 	}
 }
