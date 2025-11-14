@@ -29,7 +29,7 @@ func main() {
 	ctn := builder.Build()
 	defer ctn.DeleteWithSubContainers()
 
-	rootCmd := ctn.Get(services.CommandRootServiceName).(*cobra.Command)
+	rootCmd := ctn.Get(services.RootCommandServiceName).(*cobra.Command)
 	if err := rootCmd.Execute(); err != nil {
 		log.Fatal(fmt.Errorf("rootCmd.Execute: %w", err))
 	}

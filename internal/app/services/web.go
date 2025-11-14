@@ -1,11 +1,8 @@
 package services
 
 import (
-	"context"
-	_ "embed"
 	"net/http"
 	"project_sem/internal/app/assets"
-	"project_sem/internal/app/command"
 	"project_sem/internal/app/price"
 	"project_sem/internal/app/report"
 	"project_sem/internal/app/server"
@@ -17,12 +14,11 @@ import (
 )
 
 const (
-	WebSettingsServiceName        = "web:settings"
-	LoadHandlerServiceName        = "web:handler.load"
-	SaveHandlerServiceName        = "web:handler.save"
-	ServeMuxServiceName           = "web:router"
-	ServerServiceName             = "web:server"
-	StartServerCommandServiceName = "web:start-server"
+	WebSettingsServiceName = "web:settings"
+	LoadHandlerServiceName = "web:handler.load"
+	SaveHandlerServiceName = "web:handler.save"
+	ServeMuxServiceName    = "web:router"
+	WebServerServiceName   = "web:server"
 
 	WebHostDefault = "0.0.0.0"
 	WebPortDefault = "8080"
@@ -85,24 +81,13 @@ var WebServices = []di.Def{
 		},
 	},
 	{
-		Name:  ServerServiceName,
+		Name:  WebServerServiceName,
 		Scope: di.App,
 		Build: func(ctn di.Container) (interface{}, error) {
 			mux := ctn.Get(ServeMuxServiceName).(*http.ServeMux)
 			config := ctn.Get(WebSettingsServiceName).(*settings.WebSettings)
 
 			return server.NewWebServer(mux, config), nil
-		},
-	},
-	{
-		Name:  StartServerCommandServiceName,
-		Scope: di.App,
-		Build: func(ctn di.Container) (interface{}, error) {
-			srv := ctn.Get(ServerServiceName).(*http.Server)
-			ctx := ctn.Get(RootContextServiceName).(context.Context)
-			repo := ctn.Get(PriceRepositoryServiceName).(*price.Repository)
-
-			return command.NewStartServer(ctx, srv, repo), nil
 		},
 	},
 }

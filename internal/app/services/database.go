@@ -2,7 +2,6 @@ package services
 
 import (
 	"context"
-	"project_sem/internal/app/command"
 	"project_sem/internal/app/price"
 	"project_sem/internal/app/report"
 	"project_sem/internal/app/settings"
@@ -16,7 +15,6 @@ import (
 const (
 	DatabaseSettingsServiceName = "database:settings"
 	ConnectionServiceName       = "database:connection"
-	MigrateCommandServiceName   = "database:command.migrate"
 	PriceRepositoryServiceName  = "database:repository.price"
 	ReportRepositoryServiceName = "database:repository.report"
 
@@ -58,15 +56,6 @@ var DatabaseServices = []di.Def{
 			config := ctn.Get(DatabaseSettingsServiceName).(*settings.DatabaseSettings)
 
 			return database.New(ctx, config.DataSourceName())
-		},
-	},
-	{
-		Name:  MigrateCommandServiceName,
-		Scope: di.App,
-		Build: func(ctn di.Container) (interface{}, error) {
-			config := ctn.Get(DatabaseSettingsServiceName).(*settings.DatabaseSettings)
-
-			return command.NewMigrate(config.DataSourceName()), nil
 		},
 	},
 	{
