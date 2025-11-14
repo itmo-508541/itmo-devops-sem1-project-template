@@ -89,7 +89,7 @@ var WebServices = []di.Def{
 			mux := ctn.Get(ServeMuxServiceName).(*http.ServeMux)
 			config := ctn.Get(WebSettingsServiceName).(*settings.WebSettings)
 
-			return server.NewWebServer(mux, config.Addr()), nil
+			return server.NewWebServer(mux, config), nil
 		},
 	},
 	{
