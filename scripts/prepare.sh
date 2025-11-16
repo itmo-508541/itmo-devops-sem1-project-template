@@ -1,2 +1,2 @@
 #!/bin/bash
-make deps migrate
+make deps

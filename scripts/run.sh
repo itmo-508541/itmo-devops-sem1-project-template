@@ -1,2 +1,2 @@
 #!/bin/bash
-nohup make start-server &
+nohup make migrate start-server &

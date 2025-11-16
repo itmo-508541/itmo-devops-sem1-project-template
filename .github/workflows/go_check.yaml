@@ -45,7 +45,7 @@ jobs:
 
     - name: Run tests
       run: |
-        go test ./internal/...
+        make test
 
     - name: Make scripts executable
       run: |

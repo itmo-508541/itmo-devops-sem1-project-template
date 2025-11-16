@@ -15,6 +15,14 @@ deps:
 fmt:
 	@golangci-lint fmt -c .golangci.yaml ./...
 
+.PHONY: lint
+lint:
+	@golangci-lint run
+
+.PHONY: test
+test:
+	@go test ./internal/...
+
 .PHONY: build
 build:
 	@mkdir --parent ./build; \

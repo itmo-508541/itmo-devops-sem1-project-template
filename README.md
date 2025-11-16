@@ -20,6 +20,11 @@ REST API сервис для загрузки и выгрузки данных �
 
 К кому можно обращаться в случае вопросов?
 
-## Build dist
+## Процесс
 
-go build -tags dist -o ./build cmd/server/main.go
+checkout, lint, юнит test, scripts/prepare.sh, scripts/run.sh, scripts/tests.sh, подготовка инфраструктуры и deploy
+
+## Todo
+
+1. golangci-lint run
+2. go build -tags dist -o ./build cmd/server/main.go

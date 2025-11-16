@@ -20,5 +20,5 @@ func (a *TarArchive) ReadContents(r io.Reader) ([]byte, error) {
 	rtar := tar.NewReader(r)
 	tarFS := tarfs.New(rtar)
 
-	return a.Archive.FsContents(tarFS)
+	return a.FsContents(tarFS)
 }

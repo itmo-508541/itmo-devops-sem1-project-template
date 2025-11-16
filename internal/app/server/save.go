@@ -32,6 +32,7 @@ func NewSaveHandler(priceRepo *price.Repository, reportRepo *report.Repository) 
 		if err != nil {
 			log.Println(fmt.Errorf("Save.ServeHTTP: %w", err))
 			JSONBadRequestError(w)
+
 			return
 		} else if len(csv) > 0 && csv[len(csv)-1] != 10 {
 			csv = append(csv, 10)

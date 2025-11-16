@@ -10,6 +10,7 @@ import (
 	"github.com/gocarina/gocsv"
 )
 
+// NewLoadHandler возвращает GET handler
 // http://localhost:8080/api/v0/prices?type=csv&start=2023-01-01&end=2025-10-01&min=10&max=20
 func NewLoadHandler(reportRepo *report.Repository, v *validator.Validate) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -20,13 +21,14 @@ func NewLoadHandler(reportRepo *report.Repository, v *validator.Validate) http.H
 		fileType := r.URL.Query().Get("type")
 		if fileType == "request" {
 			JSONResponse(w, filter, http.StatusOK)
+
 			return
 		} else {
 			err = v.Struct(filter)
 			if err != nil {
 				log.Println(err)
-
 				JSONBadRequestError(w)
+
 				return
 			}
 		}
@@ -38,6 +40,7 @@ func NewLoadHandler(reportRepo *report.Repository, v *validator.Validate) http.H
 		if err != nil {
 			log.Println(fmt.Errorf("ServeHTTP: %w", err))
 			JSONInternalServerError(w)
+
 			return
 		}
 

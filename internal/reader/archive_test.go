@@ -12,6 +12,8 @@ import (
 const testDataCsvHeader = "id,name,category,price,create_date"
 
 func TestBadFilename(t *testing.T) {
+	t.Parallel()
+
 	osFs := afero.NewOsFs()
 	testDataFs := afero.NewBasePathFs(osFs, "testdata/dir-not-exists")
 
@@ -23,6 +25,8 @@ func TestBadFilename(t *testing.T) {
 }
 
 func TestNoFilename(t *testing.T) {
+	t.Parallel()
+
 	osFs := afero.NewOsFs()
 	testDataFs := afero.NewBasePathFs(osFs, "testdata/empty")
 
@@ -34,6 +38,8 @@ func TestNoFilename(t *testing.T) {
 }
 
 func TestFilename(t *testing.T) {
+	t.Parallel()
+
 	osFs := afero.NewOsFs()
 	testDataFs := afero.NewBasePathFs(osFs, "testdata/dir")
 
@@ -45,6 +51,8 @@ func TestFilename(t *testing.T) {
 }
 
 func TestFsContents(t *testing.T) {
+	t.Parallel()
+
 	osFs := afero.NewOsFs()
 	testDataFs := afero.NewBasePathFs(osFs, "testdata/dir")
 
@@ -56,6 +64,8 @@ func TestFsContents(t *testing.T) {
 }
 
 func TestContents(t *testing.T) {
+	t.Parallel()
+
 	tests := []struct {
 		archive FileContents
 		file    string
@@ -97,6 +107,8 @@ func TestContents(t *testing.T) {
 	}
 	for _, test := range tests {
 		t.Run(fmt.Sprintf("%s(%s)", test.title, test.file), func(t *testing.T) {
+			t.Parallel()
+
 			data, _ := os.ReadFile(test.file)
 			contents, err := test.archive.Contents(data)
 

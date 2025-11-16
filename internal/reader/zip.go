@@ -23,5 +23,5 @@ func (a *ZipArchive) ReadContents(r io.ReaderAt, size int64) ([]byte, error) {
 	}
 	zipFS := zipfs.New(rzip)
 
-	return a.Archive.FsContents(zipFS)
+	return a.FsContents(zipFS)
 }

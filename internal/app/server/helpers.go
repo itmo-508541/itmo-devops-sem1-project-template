@@ -17,6 +17,7 @@ const (
 	zipContentType           = "application/zip"
 )
 
+// ZipResponse формует zip response
 // https://stackoverflow.com/questions/46791169/create-serve-over-http-a-zip-file-without-writing-to-disk
 func ZipResponse(
 	writer http.ResponseWriter,
@@ -40,20 +41,27 @@ func ZipResponse(
 	if err != nil {
 		log.Printf("ZipResponse: %s\n", err.Error())
 		JSONInternalServerError(writer)
+
 		return
 	}
 
 	writer.WriteHeader(code)
 	writer.Header().Set(contentTypeHeader, zipContentType)
-	writer.Header().
-		Set(contentDispositionHeader, fmt.Sprintf("attachment; filename=\"%s\"", responseName))
-	writer.Write(buf.Bytes())
+	writer.Header().Set(
+		contentDispositionHeader,
+		fmt.Sprintf("attachment; filename=%q", responseName),
+	)
+	if _, err := writer.Write(buf.Bytes()); err != nil {
+		panic(err)
+	}
 }
 
 func TextResponse(writer http.ResponseWriter, response string, code int) {
 	writer.WriteHeader(code)
 	writer.Header().Set(contentTypeHeader, textContentType)
-	writer.Write([]byte(response))
+	if _, err := writer.Write([]byte(response)); err != nil {
+		panic(err)
+	}
 }
 
 func JSONResponse(writer http.ResponseWriter, response any, code int) {

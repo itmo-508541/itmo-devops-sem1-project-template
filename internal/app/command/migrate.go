@@ -1,6 +1,7 @@
 package command
 
 import (
+	"errors"
 	"log"
 	"project_sem/internal/app/migrations"
 
@@ -25,10 +26,14 @@ func NewMigrate(dsn string) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			if err := m.Up(); err != nil && err != migrate.ErrNoChange {
+
+			if err := m.Up(); err != nil && !errors.Is(err, migrate.ErrNoChange) {
 				return err
 			}
-			version, _, _ := m.Version()
+			version, _, err := m.Version()
+			if err != nil {
+				return err
+			}
 			log.Printf("Migrated to version #%d\n", version)
 
 			return nil

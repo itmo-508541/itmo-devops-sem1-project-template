@@ -22,7 +22,11 @@ var CommandServices = []di.Def{
 		Name:  MigrateCommandServiceName,
 		Scope: di.App,
 		Build: func(ctn di.Container) (any, error) {
-			config := ctn.Get(DatabaseSettingsServiceName).(*settings.DatabaseSettings)
+			var config *settings.DatabaseSettings
+
+			if err := ctn.Fill(DatabaseSettingsServiceName, &config); err != nil {
+				return nil, err
+			}
 
 			return command.NewMigrate(config.DataSourceName()), nil
 		},
@@ -31,9 +35,19 @@ var CommandServices = []di.Def{
 		Name:  StartServerCommandServiceName,
 		Scope: di.App,
 		Build: func(ctn di.Container) (any, error) {
-			srv := ctn.Get(WebServerServiceName).(*http.Server)
-			ctx := ctn.Get(RootContextServiceName).(context.Context)
-			repo := ctn.Get(PriceRepositoryServiceName).(*price.Repository)
+			var srv *http.Server
+			var ctx context.Context
+			var repo *price.Repository
+
+			if err := ctn.Fill(WebServerServiceName, &srv); err != nil {
+				return nil, err
+			}
+			if err := ctn.Fill(RootContextServiceName, &ctx); err != nil {
+				return nil, err
+			}
+			if err := ctn.Fill(PriceRepositoryServiceName, &repo); err != nil {
+				return nil, err
+			}
 
 			return command.NewStartServer(ctx, srv, repo), nil
 		},
@@ -42,11 +56,20 @@ var CommandServices = []di.Def{
 		Name:  RootCommandServiceName,
 		Scope: di.App,
 		Build: func(ctn di.Container) (any, error) {
+			var migrateCmd, startServerCmd *cobra.Command
+
+			if err := ctn.Fill(MigrateCommandServiceName, &migrateCmd); err != nil {
+				return nil, err
+			}
+			if err := ctn.Fill(StartServerCommandServiceName, &startServerCmd); err != nil {
+				return nil, err
+			}
+
 			rootCmd := &cobra.Command{
 				Short: "Final project 1st semester (Andrey Mindubaev, id:508541)",
 			}
-			rootCmd.AddCommand(ctn.Get(MigrateCommandServiceName).(*cobra.Command))
-			rootCmd.AddCommand(ctn.Get(StartServerCommandServiceName).(*cobra.Command))
+			rootCmd.AddCommand(migrateCmd)
+			rootCmd.AddCommand(startServerCmd)
 
 			return rootCmd, nil
 		},

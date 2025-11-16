@@ -36,28 +36,29 @@ func (r *Repository) DeleteAll(parentCtx context.Context) error {
 func (r *Repository) AcceptCsv(
 	parentCtx context.Context,
 	reader io.Reader,
-) (UUID uuid.UUID, totalCount int, err error) {
+) (uid uuid.UUID, totalCount int, err error) {
 	input := make([]PriceRecordDTO, 0)
 	output := make([]PriceRecordDTO, 0)
 
 	err = gocsv.Unmarshal(reader, &input)
 	if err != nil && false { // игнорируем(?) ошибки
 		err = fmt.Errorf("gocsv.Unmarshal: %w", err)
+
 		return
 	}
 
-	UUID = uuid.New()
+	uid = uuid.New()
 	for _, price := range input {
 		err := r.validator.Struct(price)
 		if err != nil {
 			continue
 		}
-		price.GroupUUID = UUID
+		price.GroupUUID = uid
 		price.UUID = uuid.New()
 		output = append(output, price)
 	}
 
-	return UUID, len(input), r.insertAll(parentCtx, &output)
+	return uid, len(input), r.insertAll(parentCtx, &output)
 }
 
 func (r *Repository) insertAll(parentCtx context.Context, prices *[]PriceRecordDTO) error {

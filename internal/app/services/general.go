@@ -45,6 +45,7 @@ var GeneralServices = []di.Def{
 			},
 			Close: func(obj any) error {
 				stop()
+
 				return nil
 			},
 		}
@@ -54,8 +55,12 @@ var GeneralServices = []di.Def{
 		Scope: di.App,
 		Build: func(ctn di.Container) (any, error) {
 			v := validator.New()
-			v.RegisterValidation("date", validators.DateValidator())
-			v.RegisterValidation("notblank", validators.NotBlankValidator())
+			if err := v.RegisterValidation("date", validators.DateValidator()); err != nil {
+				return nil, err
+			}
+			if err := v.RegisterValidation("notblank", validators.NotBlankValidator()); err != nil {
+				return nil, err
+			}
 
 			return v, nil
 		},

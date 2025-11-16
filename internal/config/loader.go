@@ -4,7 +4,7 @@ import (
 	"fmt"
 )
 
-func OptionalEnv(key string, defaultValue string) string {
+func OptionalEnv(key, defaultValue string) string {
 	value, ok := lookupEnv(key)
 	if !ok {
 		value = defaultValue

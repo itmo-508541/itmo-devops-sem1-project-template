@@ -21,13 +21,14 @@ func NewRepository(db *database.Database) *Repository {
 
 func (r *Repository) Renew(
 	parentCtx context.Context,
-	UUID uuid.UUID,
-) (duplicatesCount int, totalItems int, totalCategories int, totalPrice float32, err error) {
+	uid uuid.UUID,
+) (duplicatesCount, totalItems, totalCategories int, totalPrice float32, err error) {
 	ctx, cancel := context.WithCancel(parentCtx)
 	defer cancel()
 
 	if _, err = r.db.Exec(ctx, "DELETE FROM reports"); err != nil {
 		err = fmt.Errorf("db.Exec(DELETE reports): %w", err)
+
 		return
 	}
 
@@ -43,20 +44,23 @@ WHERE
 GROUP BY 
 	name, category, price, create_date`
 
-	if _, err = r.db.Exec(ctx, sql, UUID.String()); err != nil {
+	if _, err = r.db.Exec(ctx, sql, uid.String()); err != nil {
 		err = fmt.Errorf("db.Exec(INSERT INTO reports): %w", err)
+
 		return
 	}
 
 	var inserted, items, categories int
 	var prices float32
-	if err = r.db.QueryRow(ctx, "SELECT COALESCE(COUNT(*), 0) FROM prices WHERE group_uuid=$1", UUID.String()).Scan(&inserted); err != nil {
+	if err = r.db.QueryRow(ctx, "SELECT COALESCE(COUNT(*), 0) FROM prices WHERE group_uuid=$1", uid.String()).Scan(&inserted); err != nil {
 		err = fmt.Errorf("row.Scan: %w", err)
+
 		return
 	}
 
 	if err = r.db.QueryRow(ctx, "SELECT COALESCE(COUNT(*), 0) AS items, COALESCE(COUNT(DISTINCT category), 0) AS categories, COALESCE(SUM(price), 0) AS prices FROM reports").Scan(&items, &categories, &prices); err != nil {
 		err = fmt.Errorf("row.Scan: %w", err)
+
 		return
 	}
 
@@ -67,10 +71,8 @@ func (r *Repository) All(parentCtx context.Context, filter RequestFilter) (*[]Re
 	sql := "SELECT id, name, category, price, create_date FROM reports"
 	args, where, ok := filter.Where()
 	if ok {
-		sql += fmt.Sprintf(" WHERE %s", where)
+		sql += " WHERE " + where
 	}
-	// fmt.Println(sql)
-	// fmt.Println(args)
 
 	rows, err := r.db.Query(parentCtx, sql, args)
 	if err != nil {

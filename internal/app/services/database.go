@@ -35,6 +35,11 @@ var DatabaseServices = []di.Def{
 		Name:  DatabaseSettingsServiceName,
 		Scope: di.App,
 		Build: func(ctn di.Container) (any, error) {
+			var generalSettings *settings.GeneralSettings
+
+			if err := ctn.Fill(GeneralSettingsServiceName, &generalSettings); err != nil {
+				return nil, err
+			}
 			cnf := &settings.DatabaseSettings{
 				Host:     config.OptionalEnv(databaseHostEnv, DatabaseHostDefault),
 				Port:     config.OptionalEnv(databasePortEnv, DatabasePortDefault),
@@ -42,7 +47,7 @@ var DatabaseServices = []di.Def{
 				Database: config.RequiredEnv(databaseNameEnv),
 				User:     config.RequiredEnv(databaseUserEnv),
 				Password: config.RequiredEnv(databasePasswordEnv),
-				Timezone: ctn.Get(GeneralSettingsServiceName).(*settings.GeneralSettings).Timezone,
+				Timezone: generalSettings.Timezone,
 			}
 
 			return cnf, nil
@@ -52,8 +57,15 @@ var DatabaseServices = []di.Def{
 		Name:  ConnectionServiceName,
 		Scope: di.App,
 		Build: func(ctn di.Container) (any, error) {
-			ctx := ctn.Get(RootContextServiceName).(context.Context)
-			config := ctn.Get(DatabaseSettingsServiceName).(*settings.DatabaseSettings)
+			var ctx context.Context
+			var config *settings.DatabaseSettings
+
+			if err := ctn.Fill(RootContextServiceName, &ctx); err != nil {
+				return nil, err
+			}
+			if err := ctn.Fill(DatabaseSettingsServiceName, &config); err != nil {
+				return nil, err
+			}
 
 			return database.New(ctx, config.DataSourceName())
 		},
@@ -62,21 +74,30 @@ var DatabaseServices = []di.Def{
 		Name:  PriceRepositoryServiceName,
 		Scope: di.App,
 		Build: func(ctn di.Container) (any, error) {
-			conn := ctn.Get(ConnectionServiceName).(*database.Database)
-			v := ctn.Get(ValidatorServiceName).(*validator.Validate)
-			repository := price.NewRepository(conn, v)
+			var conn *database.Database
+			var v *validator.Validate
 
-			return repository, nil
+			if err := ctn.Fill(ConnectionServiceName, &conn); err != nil {
+				return nil, err
+			}
+			if err := ctn.Fill(ValidatorServiceName, &v); err != nil {
+				return nil, err
+			}
+
+			return price.NewRepository(conn, v), nil
 		},
 	},
 	{
 		Name:  ReportRepositoryServiceName,
 		Scope: di.App,
 		Build: func(ctn di.Container) (any, error) {
-			conn := ctn.Get(ConnectionServiceName).(*database.Database)
-			repository := report.NewRepository(conn)
+			var conn *database.Database
 
-			return repository, nil
+			if err := ctn.Fill(ConnectionServiceName, &conn); err != nil {
+				return nil, err
+			}
+
+			return report.NewRepository(conn), nil
 		},
 	},
 }

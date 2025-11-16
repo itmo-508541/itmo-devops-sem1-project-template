@@ -21,9 +21,7 @@ func NewStartServer(
 		Use:   startServerUse,
 		Short: "Start web-server",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			var err error
-
-			err = repo.DeleteAll(rootCtx)
+			err := repo.DeleteAll(rootCtx)
 			if err != nil {
 				return err
 			}
@@ -43,6 +41,7 @@ func NewStartServer(
 				log.Println(fmt.Errorf("srv.Shutdown: %w", err))
 			}
 			log.Println("Web-server stopped")
+
 			return err
 		},
 	}

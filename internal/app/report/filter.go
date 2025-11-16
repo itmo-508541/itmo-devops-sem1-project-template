@@ -33,7 +33,7 @@ func NewRequestFilter(r *http.Request) RequestFilter {
 }
 
 func (f RequestFilter) getInt(value string) (result int64, ok bool) {
-	if len(value) > 0 {
+	if value != "" {
 		i, err := strconv.ParseInt(value, 10, 64)
 		if err == nil {
 			result = i
@@ -42,6 +42,7 @@ func (f RequestFilter) getInt(value string) (result int64, ok bool) {
 		}
 		ok = true
 	}
+
 	return result, ok
 }
 
@@ -49,11 +50,11 @@ func (f RequestFilter) Where() (args pgx.NamedArgs, where string, ok bool) {
 	args = make(pgx.NamedArgs)
 	cond := make([]string, 0)
 
-	if len(f.Start) > 0 {
+	if f.Start != "" {
 		args["start"] = f.Start
 		cond = append(cond, "create_date >= @start")
 	}
-	if len(f.End) > 0 {
+	if f.End != "" {
 		args["end"] = f.End
 		cond = append(cond, "create_date <= @end")
 	}

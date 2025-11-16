@@ -44,8 +44,15 @@ var WebServices = []di.Def{
 		Name:  LoadHandlerServiceName,
 		Scope: di.App,
 		Build: func(ctn di.Container) (any, error) {
-			v := ctn.Get(ValidatorServiceName).(*validator.Validate)
-			reportR := ctn.Get(ReportRepositoryServiceName).(*report.Repository)
+			var v *validator.Validate
+			var reportR *report.Repository
+
+			if err := ctn.Fill(ValidatorServiceName, &v); err != nil {
+				return nil, err
+			}
+			if err := ctn.Fill(ReportRepositoryServiceName, &reportR); err != nil {
+				return nil, err
+			}
 
 			handler := server.NewLoadHandler(reportR, v)
 
@@ -56,8 +63,15 @@ var WebServices = []di.Def{
 		Name:  SaveHandlerServiceName,
 		Scope: di.App,
 		Build: func(ctn di.Container) (any, error) {
-			priceR := ctn.Get(PriceRepositoryServiceName).(*price.Repository)
-			reportR := ctn.Get(ReportRepositoryServiceName).(*report.Repository)
+			var priceR *price.Repository
+			var reportR *report.Repository
+
+			if err := ctn.Fill(PriceRepositoryServiceName, &priceR); err != nil {
+				return nil, err
+			}
+			if err := ctn.Fill(ReportRepositoryServiceName, &reportR); err != nil {
+				return nil, err
+			}
 
 			handler := server.NewSaveHandler(priceR, reportR)
 
@@ -68,8 +82,14 @@ var WebServices = []di.Def{
 		Name:  ServeMuxServiceName,
 		Scope: di.App,
 		Build: func(ctn di.Container) (any, error) {
-			loadHandler := ctn.Get(LoadHandlerServiceName).(http.HandlerFunc)
-			saveHandler := ctn.Get(SaveHandlerServiceName).(http.HandlerFunc)
+			var loadHandler, saveHandler http.HandlerFunc
+
+			if err := ctn.Fill(LoadHandlerServiceName, &loadHandler); err != nil {
+				return nil, err
+			}
+			if err := ctn.Fill(SaveHandlerServiceName, &saveHandler); err != nil {
+				return nil, err
+			}
 
 			mux := http.NewServeMux()
 			mux.Handle("GET /api/v0/prices", server.PanicRecoveryMiddleware(loadHandler))
@@ -84,8 +104,15 @@ var WebServices = []di.Def{
 		Name:  WebServerServiceName,
 		Scope: di.App,
 		Build: func(ctn di.Container) (any, error) {
-			mux := ctn.Get(ServeMuxServiceName).(*http.ServeMux)
-			config := ctn.Get(WebSettingsServiceName).(*settings.WebSettings)
+			var mux *http.ServeMux
+			var config *settings.WebSettings
+
+			if err := ctn.Fill(ServeMuxServiceName, &mux); err != nil {
+				return nil, err
+			}
+			if err := ctn.Fill(WebSettingsServiceName, &config); err != nil {
+				return nil, err
+			}
 
 			return server.NewWebServer(mux, config), nil
 		},
