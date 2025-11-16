@@ -64,16 +64,36 @@ func TestContents(t *testing.T) {
 	}{
 		{archive: &ZipArchive{}, file: "testdata/zip/test.zip", title: "Zip", err: false},
 		{archive: &ZipArchive{}, file: "testdata/tar/test.tar", title: "BadZip", err: true},
-		{archive: &ZipArchive{}, file: "testdata/not-a-dir/not-a-file.txt", title: "Zip NoFile", err: true},
+		{
+			archive: &ZipArchive{},
+			file:    "testdata/not-a-dir/not-a-file.txt",
+			title:   "Zip NoFile",
+			err:     true,
+		},
 
 		{archive: &TarArchive{}, file: "testdata/tar/test.tar", title: "Tar", err: false},
 		{archive: &TarArchive{}, file: "testdata/zip/test.zip", title: "BadTar", err: true},
-		{archive: &TarArchive{}, file: "testdata/not-a-dir/not-a-file.txt", title: "Tar NoFile", err: true},
+		{
+			archive: &TarArchive{},
+			file:    "testdata/not-a-dir/not-a-file.txt",
+			title:   "Tar NoFile",
+			err:     true,
+		},
 
 		{archive: &MultiArchive{}, file: "testdata/tar/test.tar", title: "Multi Tar", err: false},
 		{archive: &MultiArchive{}, file: "testdata/zip/test.zip", title: "Multi Zip", err: false},
-		{archive: &MultiArchive{}, file: "testdata/dir/test.csv", title: "Multy Not Archive", err: true},
-		{archive: &MultiArchive{}, file: "testdata/not-a-dir/not-a-file.txt", title: "Multy NoFile", err: true},
+		{
+			archive: &MultiArchive{},
+			file:    "testdata/dir/test.csv",
+			title:   "Multy Not Archive",
+			err:     true,
+		},
+		{
+			archive: &MultiArchive{},
+			file:    "testdata/not-a-dir/not-a-file.txt",
+			title:   "Multy NoFile",
+			err:     true,
+		},
 	}
 	for _, test := range tests {
 		t.Run(fmt.Sprintf("%s(%s)", test.title, test.file), func(t *testing.T) {

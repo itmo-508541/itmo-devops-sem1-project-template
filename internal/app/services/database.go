@@ -2,14 +2,15 @@ package services
 
 import (
 	"context"
+
+	"github.com/go-playground/validator/v10"
+	"github.com/sarulabs/di"
+
 	"project_sem/internal/app/price"
 	"project_sem/internal/app/report"
 	"project_sem/internal/app/settings"
 	"project_sem/internal/config"
 	"project_sem/internal/database"
-
-	"github.com/go-playground/validator/v10"
-	"github.com/sarulabs/di"
 )
 
 const (
@@ -34,7 +35,7 @@ var DatabaseServices = []di.Def{
 	{
 		Name:  DatabaseSettingsServiceName,
 		Scope: di.App,
-		Build: func(ctn di.Container) (interface{}, error) {
+		Build: func(ctn di.Container) (any, error) {
 			cnf := &settings.DatabaseSettings{
 				Host:     config.OptionalEnv(databaseHostEnv, DatabaseHostDefault),
 				Port:     config.OptionalEnv(databasePortEnv, DatabasePortDefault),
@@ -51,7 +52,7 @@ var DatabaseServices = []di.Def{
 	{
 		Name:  ConnectionServiceName,
 		Scope: di.App,
-		Build: func(ctn di.Container) (interface{}, error) {
+		Build: func(ctn di.Container) (any, error) {
 			ctx := ctn.Get(RootContextServiceName).(context.Context)
 			config := ctn.Get(DatabaseSettingsServiceName).(*settings.DatabaseSettings)
 
@@ -61,7 +62,7 @@ var DatabaseServices = []di.Def{
 	{
 		Name:  PriceRepositoryServiceName,
 		Scope: di.App,
-		Build: func(ctn di.Container) (interface{}, error) {
+		Build: func(ctn di.Container) (any, error) {
 			conn := ctn.Get(ConnectionServiceName).(*database.Database)
 			v := ctn.Get(ValidatorServiceName).(*validator.Validate)
 			repository := price.NewRepository(conn, v)
@@ -72,7 +73,7 @@ var DatabaseServices = []di.Def{
 	{
 		Name:  ReportRepositoryServiceName,
 		Scope: di.App,
-		Build: func(ctn di.Container) (interface{}, error) {
+		Build: func(ctn di.Container) (any, error) {
 			conn := ctn.Get(ConnectionServiceName).(*database.Database)
 			repository := report.NewRepository(conn)
 

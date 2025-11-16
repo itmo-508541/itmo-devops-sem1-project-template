@@ -18,7 +18,13 @@ const (
 )
 
 // https://stackoverflow.com/questions/46791169/create-serve-over-http-a-zip-file-without-writing-to-disk
-func ZipResponse(writer http.ResponseWriter, responseName string, contents string, contentsName string, code int) {
+func ZipResponse(
+	writer http.ResponseWriter,
+	responseName string,
+	contents string,
+	contentsName string,
+	code int,
+) {
 	var err error
 
 	buf := new(bytes.Buffer)
@@ -39,7 +45,8 @@ func ZipResponse(writer http.ResponseWriter, responseName string, contents strin
 
 	writer.WriteHeader(code)
 	writer.Header().Set(contentTypeHeader, zipContentType)
-	writer.Header().Set(contentDispositionHeader, fmt.Sprintf("attachment; filename=\"%s\"", responseName))
+	writer.Header().
+		Set(contentDispositionHeader, fmt.Sprintf("attachment; filename=\"%s\"", responseName))
 	writer.Write(buf.Bytes())
 }
 

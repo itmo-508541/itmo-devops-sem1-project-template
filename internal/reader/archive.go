@@ -11,8 +11,7 @@ type FileContents interface {
 	Contents(b []byte) ([]byte, error)
 }
 
-type Archive struct {
-}
+type Archive struct{}
 
 func (a *Archive) FsContents(fs afero.Fs) (result []byte, err error) {
 	defer func() {
@@ -38,7 +37,6 @@ func (a *Archive) Filename(fs afero.Fs) (fileName string, err error) {
 
 	var files []os.FileInfo
 	files, err = afero.ReadDir(fs, ".")
-
 	if err != nil {
 		return "", err
 	}

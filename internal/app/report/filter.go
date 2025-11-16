@@ -47,7 +47,7 @@ func (f RequestFilter) getInt(value string) (result int64, ok bool) {
 
 func (f RequestFilter) Where() (args pgx.NamedArgs, where string, ok bool) {
 	args = make(pgx.NamedArgs)
-	var cond = make([]string, 0)
+	cond := make([]string, 0)
 
 	if len(f.Start) > 0 {
 		args["start"] = f.Start

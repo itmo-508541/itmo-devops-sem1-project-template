@@ -1,0 +1,164 @@
+version: "2"
+
+run:
+  build-tags:
+    - integration
+  tests: true
+
+linters:
+  default: none
+  enable:
+    - asciicheck
+    - bidichk
+    - bodyclose
+    - canonicalheader
+    - contextcheck
+    - depguard
+    - errcheck
+    - errchkjson
+    - errname
+    - errorlint
+    - forbidigo
+    - gocheckcompilerdirectives
+    - gochecknoinits
+    - goconst
+    - gocritic
+    - goprintffuncname
+    - gosec
+    - govet
+    - importas
+    - ineffassign
+    - intrange
+    - makezero
+    - nilerr
+    - nlreturn
+    - nolintlint
+    - paralleltest
+    - perfsprint
+    - prealloc
+    - revive
+    - rowserrcheck
+    - sqlclosecheck
+    - staticcheck
+    - tparallel
+    - unconvert
+    - unused
+    - usestdlibvars
+    - wastedassign
+    - whitespace
+    - wsl_v5
+  settings:
+    depguard:
+      rules:
+        main:
+          deny:
+            - pkg: github.com/pborman/uuid
+              desc: Use github.com/google/uuid instead
+            - pkg: github.com/golang/mock
+              desc: Use github.com/uber-go/mock instead
+    errcheck:
+      check-type-assertions: true
+      check-blank: true
+    errchkjson:
+      report-no-exported: true
+    gocritic:
+      disabled-checks:
+        - appendAssign
+        - commentedOutCode
+        - dupImport
+        - hugeParam
+        - rangeValCopy
+        - unnamedResult
+        - whyNoLint
+      enabled-tags:
+        - diagnostic
+        - experimental
+        - opinionated
+        - performance
+        - style
+    importas:
+      no-unaliased: true
+    nolintlint:
+      allow-unused: true
+    revive:
+      rules:
+        - name: var-naming
+          disabled: true
+    staticcheck:
+      checks:
+        - all
+        - '-ST1000' #at least one file in a package should have a package comment
+        - '-ST1003' #not use underscores in package names
+    wrapcheck:
+      ignore-sigs:
+        - fmt.Errorf(
+        - errors.New(
+    wsl_v5:
+      allow-first-in-block: true
+      allow-whole-block: false
+      branch-max-lines: 2
+      disable:
+        - assign
+        - decl
+  exclusions:
+    generated: lax
+    rules:
+      - linters:
+          - bidichk
+          - errcheck
+          - goconst
+          - gosec
+          - govet
+          - rowserrcheck
+          - staticcheck
+          - unparam
+          - wrapcheck
+          - wsl
+        path: _test\.go
+      - linters:
+          - bidichk
+          - errcheck
+          - gosec
+          - govet
+          - wrapcheck
+          - wsl
+        path: internal/generated
+      - path: (.+)\.go$
+        text: SA1019
+      - path: (.+)\.go$
+        text: G115
+      - path: (.+)\.go$
+        text: G404
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
+
+issues:
+  max-issues-per-linter: 0
+  max-same-issues: 0
+
+formatters:
+  enable:
+    - gci
+    - gofmt
+    - gofumpt
+    - golines
+  settings:
+    gci:
+      sections:
+        - standard
+        - default
+        - prefix(project_sem)
+      custom-order: false
+      skip-generated: false
+    gofmt:
+      rewrite-rules:
+        - pattern: interface{}
+          replacement: any
+  exclusions:
+    generated: lax
+    paths:
+      - third_party$
+      - builtin$
+      - examples$

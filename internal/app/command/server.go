@@ -5,14 +5,19 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"project_sem/internal/app/price"
 
 	"github.com/spf13/cobra"
+
+	"project_sem/internal/app/price"
 )
 
 const startServerUse = "start-server"
 
-func NewStartServer(rootCtx context.Context, srv *http.Server, repo *price.Repository) *cobra.Command {
+func NewStartServer(
+	rootCtx context.Context,
+	srv *http.Server,
+	repo *price.Repository,
+) *cobra.Command {
 	return &cobra.Command{
 		Use:   startServerUse,
 		Short: "Start web-server",

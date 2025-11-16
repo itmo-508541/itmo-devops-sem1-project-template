@@ -4,11 +4,12 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"project_sem/internal/database"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/gocarina/gocsv"
 	"github.com/google/uuid"
+
+	"project_sem/internal/database"
 )
 
 type Repository struct {
@@ -33,7 +34,10 @@ func (r *Repository) DeleteAll(parentCtx context.Context) error {
 	return nil
 }
 
-func (r *Repository) AcceptCsv(parentCtx context.Context, reader io.Reader) (UUID uuid.UUID, totalCount int, err error) {
+func (r *Repository) AcceptCsv(
+	parentCtx context.Context,
+	reader io.Reader,
+) (UUID uuid.UUID, totalCount int, err error) {
 	input := make([]PriceRecordDTO, 0)
 	output := make([]PriceRecordDTO, 0)
 

@@ -3,10 +3,11 @@ package main
 import (
 	"fmt"
 	"log"
-	"project_sem/internal/app/services"
 
 	"github.com/sarulabs/di"
 	"github.com/spf13/cobra"
+
+	"project_sem/internal/app/services"
 )
 
 func main() {

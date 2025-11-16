@@ -1,9 +1,9 @@
 package price
 
 import (
-	"project_sem/internal/app/report"
-
 	"github.com/google/uuid"
+
+	"project_sem/internal/app/report"
 )
 
 type PriceRecordDTO struct {

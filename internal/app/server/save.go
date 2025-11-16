@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+
 	"project_sem/internal/app/price"
 	"project_sem/internal/app/report"
 	"project_sem/internal/reader"
@@ -44,7 +45,10 @@ func NewSaveHandler(priceRepo *price.Repository, reportRepo *report.Repository) 
 
 		sr := saveResultDTO{TotalCount: totalCount}
 		if err == nil {
-			sr.DuplicatesCount, sr.TotalItems, sr.TotalCategories, sr.TotalPrice, err = reportRepo.Renew(r.Context(), UUID)
+			sr.DuplicatesCount, sr.TotalItems, sr.TotalCategories, sr.TotalPrice, err = reportRepo.Renew(
+				r.Context(),
+				UUID,
+			)
 			if err != nil {
 				err = fmt.Errorf("reportRepo.Renew: %w", err)
 			}

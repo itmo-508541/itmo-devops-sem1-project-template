@@ -2,15 +2,16 @@ package services
 
 import (
 	"net/http"
+
+	"github.com/go-playground/validator/v10"
+	"github.com/sarulabs/di"
+
 	"project_sem/internal/app/assets"
 	"project_sem/internal/app/price"
 	"project_sem/internal/app/report"
 	"project_sem/internal/app/server"
 	"project_sem/internal/app/settings"
 	"project_sem/internal/config"
-
-	"github.com/go-playground/validator/v10"
-	"github.com/sarulabs/di"
 )
 
 const (
@@ -31,7 +32,7 @@ var WebServices = []di.Def{
 	{
 		Name:  WebSettingsServiceName,
 		Scope: di.App,
-		Build: func(ctn di.Container) (interface{}, error) {
+		Build: func(ctn di.Container) (any, error) {
 			cfg := &settings.WebSettings{
 				Host: config.OptionalEnv(webHostEnv, WebHostDefault),
 				Port: config.OptionalEnv(webPortEnv, WebPortDefault),
@@ -43,7 +44,7 @@ var WebServices = []di.Def{
 	{
 		Name:  LoadHandlerServiceName,
 		Scope: di.App,
-		Build: func(ctn di.Container) (interface{}, error) {
+		Build: func(ctn di.Container) (any, error) {
 			v := ctn.Get(ValidatorServiceName).(*validator.Validate)
 			reportR := ctn.Get(ReportRepositoryServiceName).(*report.Repository)
 
@@ -55,7 +56,7 @@ var WebServices = []di.Def{
 	{
 		Name:  SaveHandlerServiceName,
 		Scope: di.App,
-		Build: func(ctn di.Container) (interface{}, error) {
+		Build: func(ctn di.Container) (any, error) {
 			priceR := ctn.Get(PriceRepositoryServiceName).(*price.Repository)
 			reportR := ctn.Get(ReportRepositoryServiceName).(*report.Repository)
 
@@ -67,7 +68,7 @@ var WebServices = []di.Def{
 	{
 		Name:  ServeMuxServiceName,
 		Scope: di.App,
-		Build: func(ctn di.Container) (interface{}, error) {
+		Build: func(ctn di.Container) (any, error) {
 			loadHandler := ctn.Get(LoadHandlerServiceName).(http.HandlerFunc)
 			saveHandler := ctn.Get(SaveHandlerServiceName).(http.HandlerFunc)
 
@@ -83,7 +84,7 @@ var WebServices = []di.Def{
 	{
 		Name:  WebServerServiceName,
 		Scope: di.App,
-		Build: func(ctn di.Container) (interface{}, error) {
+		Build: func(ctn di.Container) (any, error) {
 			mux := ctn.Get(ServeMuxServiceName).(*http.ServeMux)
 			config := ctn.Get(WebSettingsServiceName).(*settings.WebSettings)
 

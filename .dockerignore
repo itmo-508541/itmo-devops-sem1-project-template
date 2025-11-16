@@ -1,0 +1,7 @@
+/sample_data
+/scripts
+/docker-compose.yml
+/Dockerfile
+/Makefile
+/*.out
+/*.md

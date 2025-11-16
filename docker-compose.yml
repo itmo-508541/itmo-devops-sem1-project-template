@@ -1,4 +1,14 @@
 services:
+  server:
+    build: .
+    env_file: .env
+    environment:
+      - APP_DB_HOST=postgres
+    ports:
+      - "${APP_PORT}:8080"
+    depends_on:
+      - postgres
+
   postgres:
     image: postgres:15
     ports:

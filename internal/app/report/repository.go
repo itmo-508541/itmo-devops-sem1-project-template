@@ -3,10 +3,11 @@ package report
 import (
 	"context"
 	"fmt"
-	"project_sem/internal/database"
 	"time"
 
 	"github.com/google/uuid"
+
+	"project_sem/internal/database"
 )
 
 type Repository struct {
@@ -19,7 +20,10 @@ func NewRepository(db *database.Database) *Repository {
 	return repository
 }
 
-func (r *Repository) Renew(parentCtx context.Context, UUID uuid.UUID) (duplicatesCount int, totalItems int, totalCategories int, totalPrice float32, err error) {
+func (r *Repository) Renew(
+	parentCtx context.Context,
+	UUID uuid.UUID,
+) (duplicatesCount int, totalItems int, totalCategories int, totalPrice float32, err error) {
 	ctx, cancel := context.WithCancel(parentCtx)
 	defer cancel()
 

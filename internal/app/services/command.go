@@ -3,12 +3,13 @@ package services
 import (
 	"context"
 	"net/http"
-	"project_sem/internal/app/command"
-	"project_sem/internal/app/price"
-	"project_sem/internal/app/settings"
 
 	"github.com/sarulabs/di"
 	"github.com/spf13/cobra"
+
+	"project_sem/internal/app/command"
+	"project_sem/internal/app/price"
+	"project_sem/internal/app/settings"
 )
 
 const (
@@ -21,7 +22,7 @@ var CommandServices = []di.Def{
 	{
 		Name:  MigrateCommandServiceName,
 		Scope: di.App,
-		Build: func(ctn di.Container) (interface{}, error) {
+		Build: func(ctn di.Container) (any, error) {
 			config := ctn.Get(DatabaseSettingsServiceName).(*settings.DatabaseSettings)
 
 			return command.NewMigrate(config.DataSourceName()), nil
@@ -30,7 +31,7 @@ var CommandServices = []di.Def{
 	{
 		Name:  StartServerCommandServiceName,
 		Scope: di.App,
-		Build: func(ctn di.Container) (interface{}, error) {
+		Build: func(ctn di.Container) (any, error) {
 			srv := ctn.Get(WebServerServiceName).(*http.Server)
 			ctx := ctn.Get(RootContextServiceName).(context.Context)
 			repo := ctn.Get(PriceRepositoryServiceName).(*price.Repository)
@@ -41,7 +42,7 @@ var CommandServices = []di.Def{
 	{
 		Name:  RootCommandServiceName,
 		Scope: di.App,
-		Build: func(ctn di.Container) (interface{}, error) {
+		Build: func(ctn di.Container) (any, error) {
 			rootCmd := &cobra.Command{
 				Short: "Final project 1st semester (Andrey Mindubaev, id:508541)",
 			}

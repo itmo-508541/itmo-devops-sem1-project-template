@@ -4,10 +4,11 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"project_sem/internal/app/report"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/gocarina/gocsv"
+
+	"project_sem/internal/app/report"
 )
 
 // http://localhost:8080/api/v0/prices?type=csv&start=2023-01-01&end=2025-10-01&min=10&max=20

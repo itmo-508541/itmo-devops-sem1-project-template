@@ -3,13 +3,14 @@ package services
 import (
 	"context"
 	"os/signal"
-	"project_sem/internal/app/settings"
-	"project_sem/internal/app/validators"
-	"project_sem/internal/config"
 	"syscall"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/sarulabs/di"
+
+	"project_sem/internal/app/settings"
+	"project_sem/internal/app/validators"
+	"project_sem/internal/config"
 )
 
 const (
@@ -26,7 +27,7 @@ var GeneralServices = []di.Def{
 	{
 		Name:  GeneralSettingsServiceName,
 		Scope: di.App,
-		Build: func(ctn di.Container) (interface{}, error) {
+		Build: func(ctn di.Container) (any, error) {
 			cfg := &settings.GeneralSettings{
 				Timezone: config.OptionalEnv(timezoneEnv, TimezoneDefault),
 			}
@@ -40,10 +41,10 @@ var GeneralServices = []di.Def{
 		return di.Def{
 			Name:  RootContextServiceName,
 			Scope: di.App,
-			Build: func(ctn di.Container) (interface{}, error) {
+			Build: func(ctn di.Container) (any, error) {
 				return rootCtx, nil
 			},
-			Close: func(obj interface{}) error {
+			Close: func(obj any) error {
 				stop()
 				return nil
 			},
@@ -52,7 +53,7 @@ var GeneralServices = []di.Def{
 	{
 		Name:  ValidatorServiceName,
 		Scope: di.App,
-		Build: func(ctn di.Container) (interface{}, error) {
+		Build: func(ctn di.Container) (any, error) {
 			v := validator.New()
 			v.RegisterValidation("date", validators.DateValidator())
 			v.RegisterValidation("notblank", validators.NotBlankValidator())

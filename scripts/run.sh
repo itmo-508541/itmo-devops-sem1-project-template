@@ -1,2 +1,2 @@
 #!/bin/bash
-nohup ./bin/app start-server &
+nohup make start-server &
