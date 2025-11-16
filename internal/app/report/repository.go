@@ -3,11 +3,10 @@ package report
 import (
 	"context"
 	"fmt"
+	"project_sem/internal/database"
 	"time"
 
 	"github.com/google/uuid"
-
-	"project_sem/internal/database"
 )
 
 type Repository struct {

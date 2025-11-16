@@ -5,10 +5,9 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"project_sem/internal/app/price"
 
 	"github.com/spf13/cobra"
-
-	"project_sem/internal/app/price"
 )
 
 const startServerUse = "start-server"

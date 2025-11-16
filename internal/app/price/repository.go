@@ -4,12 +4,11 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"project_sem/internal/database"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/gocarina/gocsv"
 	"github.com/google/uuid"
-
-	"project_sem/internal/database"
 )
 
 type Repository struct {

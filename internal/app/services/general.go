@@ -3,14 +3,13 @@ package services
 import (
 	"context"
 	"os/signal"
+	"project_sem/internal/app/settings"
+	"project_sem/internal/app/validators"
+	"project_sem/internal/config"
 	"syscall"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/sarulabs/di"
-
-	"project_sem/internal/app/settings"
-	"project_sem/internal/app/validators"
-	"project_sem/internal/config"
 )
 
 const (

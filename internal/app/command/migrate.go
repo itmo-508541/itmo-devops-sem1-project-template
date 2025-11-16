@@ -2,13 +2,12 @@ package command
 
 import (
 	"log"
+	"project_sem/internal/app/migrations"
 
 	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	"github.com/golang-migrate/migrate/v4/source/iofs"
 	"github.com/spf13/cobra"
-
-	"project_sem/internal/app/migrations"
 )
 
 const commandUse = "migrate"

@@ -3,13 +3,12 @@ package services
 import (
 	"context"
 	"net/http"
-
-	"github.com/sarulabs/di"
-	"github.com/spf13/cobra"
-
 	"project_sem/internal/app/command"
 	"project_sem/internal/app/price"
 	"project_sem/internal/app/settings"
+
+	"github.com/sarulabs/di"
+	"github.com/spf13/cobra"
 )
 
 const (

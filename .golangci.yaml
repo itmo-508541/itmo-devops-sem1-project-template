@@ -140,18 +140,10 @@ issues:
 
 formatters:
   enable:
-    - gci
     - gofmt
     - gofumpt
     - golines
   settings:
-    gci:
-      sections:
-        - standard
-        - default
-        - prefix(project_sem)
-      custom-order: false
-      skip-generated: false
     gofmt:
       rewrite-rules:
         - pattern: interface{}

@@ -2,16 +2,15 @@ package services
 
 import (
 	"net/http"
-
-	"github.com/go-playground/validator/v10"
-	"github.com/sarulabs/di"
-
 	"project_sem/internal/app/assets"
 	"project_sem/internal/app/price"
 	"project_sem/internal/app/report"
 	"project_sem/internal/app/server"
 	"project_sem/internal/app/settings"
 	"project_sem/internal/config"
+
+	"github.com/go-playground/validator/v10"
+	"github.com/sarulabs/di"
 )
 
 const (
