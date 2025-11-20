@@ -1,9 +1,11 @@
+name: itmo-devops-sem1-project
+
 include:
-  - postgres.yml
+  - docker-compose/postgres.yml
 
 services:
   server:
     extends:
-      file: server.yml
+      file: docker-compose/server.yml
       service: server
     image: itmo508541/itmo-devops-sem1-project:latest

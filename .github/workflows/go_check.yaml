@@ -129,3 +129,62 @@ jobs:
         context: .
         push: true
         tags: itmo508541/itmo-devops-sem1-project:latest
+
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-lates
+    needs: docker_image
+    steps:
+    - uses: actions/checkout@v3
+    - name: Create docker compose yml
+      run: make compose
+
+    - name: Cache yc binary
+      uses: actions/cache@v4
+      id: cache-yc-cli
+      with:
+        path: /usr/local/bin/yc
+        key: yc-cli-0.175.0
+
+    - name: Get yc binary if cache miss
+      if: steps.cache-yc-cli.outputs.cache-hit != 'true'
+      shell: bash
+      run: |
+        sudo curl --fail "https://storage.yandexcloud.net/yandexcloud-yc/release/0.175.0/linux/amd64/yc" -o /usr/local/bin/yc
+        sudo chmod a+rx /usr/local/bin/yc
+
+    - uses: webfactory/ssh-agent@v0.9.0
+      with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+    - name: Create and provision VM
+      shell: bash
+      env:
+        YC_CLOUD_ID: ${{ secrets.YC_CLOUD_ID }}
+        YC_FOLDER_ID: ${{ secrets.YC_FOLDER_ID }}
+        YC_SA_JSON_CREDENTIALS: ${{ secrets.YC_SA_JSON_CREDENTIALS }}
+      run: |
+        echo $YC_SA_JSON_CREDENTIALS > instance.json
+        yc config set service-account-key instance.json
+        yc config set cloud-id $YC_CLOUD_ID
+        yc config set folder-id $YC_FOLDER_ID
+
+        yc compute instance create \
+          --name itmo508541_vm \
+          --description "sem1-project-vm" \
+          --zone ru-central1-d \
+          --cores 2 \
+          --memory 2 \
+          --preemptible \
+          --create-boot-disk name=itmo508541-disk,type=network-ssd,size=10,image-folder-id=standard-images,image-family=ubuntu-2404-lts \
+          --network-interface subnet-name=itmo508541-subnet,nat-ip-version=ipv4 \
+          --metadata-from-file user-data=./scripts/user-data.yaml \
+          --format json  > instance.json || yc compute instance get --name itmo508541_vm --format=json > instance.json
+
+        SERVER_ADDRESS=`cat instance.json | jq .network_interfaces[0].primary_v4_address.one_to_one_nat.address -r`
+        while ! nc -z -v -w30 $SERVER_ADDRESS 22; do   
+          sleep 1
+        done
+
+        ssh runner@$SERVER_ADDRESS -o StrictHostKeyChecking=no "curl -fsSL https://get.docker.com -o get-docker.sh ;
+          sudo bash ./get-docker.sh"

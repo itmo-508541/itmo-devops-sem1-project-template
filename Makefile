@@ -23,15 +23,10 @@ lint:
 test:
 	@go test ./internal/...
 
-.PHONY: build
-build:
+.PHONY: compose
+compose:
 	@mkdir --parent ./build; \
-	go build -o ./build/app ./cmd/main.go
-
-.PHONY: dist
-dist:
-	@mkdir --parent ./build; \
-	go build -tags dist -o ./build/app ./cmd/main.go
+	docker compose -f docker-compose.deploy.yml config > ./build/deploy.yml
 
 .PHONY: migrate
 migrate:
