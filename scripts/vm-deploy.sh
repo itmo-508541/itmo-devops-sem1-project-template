@@ -1,22 +1,17 @@
 #!/bin/bash
 
+docker compose -f docker-compose.deploy.yml config > ./build/deploy.yml
+
 while ! nc -z -v -w30 $1 22; do
   sleep 1
 done
 
-ssh-keyscan $1 >> ~/.ssh/known_hosts
-ssh $1 "curl -fsSL https://get.docker.com -o get-docker.sh ;
-  sudo bash ./get-docker.sh ;
-  sudo chown runner:runner /srv ;
-  rm /srv/deploy.yml || true"
+ssh-keyscan runner@$1 >> ~/.ssh/known_hosts
+scp -P 22 -r ./build/deploy.yml runner@$1:/tmp/deploy.yml
 
-mkdir --parent ./build
-docker compose -f docker-compose.deploy.yml config > ./build/deploy.yml
-scp -P 22 -r ./build/deploy.yml $1:/srv/deploy.yml
-
-ssh $1 -o StrictHostKeyChecking=no "cd /srv ;
+ssh runner@$1 "if ! command -v docker; then sudo apt update && sudo apt install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin ; fi ;
+  cd /srv ;
   docker compose stop || true ;
-  rm docker-compose.yml || true ;
-  mv deploy.yml docker-compose.yml ;
-  docker compose pull ;
+  sudo mv /tmp/deploy.yml docker-compose.yml ;
+  docker compose pull -q ;
   docker compose up -d"
