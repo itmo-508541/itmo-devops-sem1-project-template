@@ -4,7 +4,8 @@ while ! nc -z -v -w30 $1 22; do
   sleep 1
 done
 
-ssh $1 -o StrictHostKeyChecking=no "curl -fsSL https://get.docker.com -o get-docker.sh ;
+ssh-keyscan $1 >> ~/.ssh/known_hosts
+ssh $1 "curl -fsSL https://get.docker.com -o get-docker.sh ;
   sudo bash ./get-docker.sh ;
   sudo chown runner:runner /srv ;
   rm /srv/deploy.yml || true"
