@@ -10,4 +10,4 @@ yc compute instance create \
   --create-boot-disk name=itmo508541-disk,type=network-ssd,size=10,image-folder-id=standard-images,image-family=ubuntu-2404-lts \
   --network-interface subnet-name=itmo508541-subnet,nat-ip-version=ipv4 \
   --metadata-from-file user-data=./scripts/user-data.yaml \
-  --format json  > ./build/instance.json || yc compute instance get --name itmo508541_vm --format=json > ./build/instance.json
+  --format json  > $1 || yc compute instance get --name itmo508541_vm --format=json > $1

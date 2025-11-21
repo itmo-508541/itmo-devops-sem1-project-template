@@ -178,15 +178,15 @@ jobs:
         REPO: ${{ github.repository }}
       run: |
         mkdir --parent ./build
+        JSON=./build/instance.json
 
-        echo $YC_SA_JSON_CREDENTIALS > ./build/instance.json
-        yc config set service-account-key ./build/instance.json
+        echo $YC_SA_JSON_CREDENTIALS > $JSON
+        yc config set service-account-key $JSON
         yc config set cloud-id $YC_CLOUD_ID
         yc config set folder-id $YC_FOLDER_ID
 
-        ./scripts/vm-create.sh
-
-        SERVER_ADDRESS=`cat ./build/instance.json | jq .network_interfaces[0].primary_v4_address.one_to_one_nat.address -r`
+        ./scripts/vm-create.sh $JSON
+        SERVER_ADDRESS=`cat $JSON | jq .network_interfaces[0].primary_v4_address.one_to_one_nat.address -r`
         echo $SERVER_ADDRESS
         ./scripts/vm-deploy.sh $SERVER_ADDRESS
 
