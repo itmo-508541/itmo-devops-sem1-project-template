@@ -19,7 +19,7 @@ func NewMigrate() *cobra.Command {
 		Use:   commandUse,
 		Short: "Migrate database schema",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			dsn := settings.NewDatabaseSettings().DataSourceName()
+			dsn := settings.DatabaseSourceName()
 
 			schema, err := iofs.New(migrations.Schema, migrations.SchemaPath)
 			if err != nil {

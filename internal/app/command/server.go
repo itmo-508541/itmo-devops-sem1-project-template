@@ -26,7 +26,7 @@ func NewStartServer() *cobra.Command {
 			ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 			defer stop()
 
-			conn, err := database.New(ctx, settings.NewDatabaseSettings().DataSourceName())
+			conn, err := database.New(ctx, settings.DatabaseSourceName())
 			if err != nil {
 				return err
 			}
@@ -37,13 +37,13 @@ func NewStartServer() *cobra.Command {
 			mux := http.NewServeMux()
 			mux.Handle("GET /api/v0/prices", server.PanicRecoveryMiddleware(loadHandler))
 			mux.Handle("POST /api/v0/prices", server.PanicRecoveryMiddleware(saveHandler))
-			// @todo как-то сделать, чтобы было только для разработки
-			mux.Handle("/favicon.ico", http.FileServer(http.FS(assets.FaviconFS)))
-			mux.Handle("/", http.FileServer(http.FS(assets.IndexFS)))
+			mux.Handle("GET /favicon.ico", http.FileServer(http.FS(assets.FaviconFS)))
+			// мне нужна web-страница для ручного тестирования
+			mux.Handle("GET /", http.FileServer(http.FS(assets.IndexFS)))
 
 			srv := &http.Server{
 				Handler:      mux,
-				Addr:         settings.NewWebSettings().Addr(),
+				Addr:         settings.WebServerAddr(),
 				WriteTimeout: 15 * time.Second,
 				ReadTimeout:  15 * time.Second,
 			}
