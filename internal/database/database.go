@@ -23,7 +23,7 @@ func New(ctx context.Context, dsn string) (*Database, error) {
 
 func (d *Database) WithTransaction(
 	parentCtx context.Context,
-	do func(conn Connection) error,
+	do TransactionCallback,
 ) error {
 	ctx, cancel := context.WithCancel(parentCtx)
 	defer cancel()
@@ -34,7 +34,7 @@ func (d *Database) WithTransaction(
 	}
 
 	tx := &transaction{rawTx}
-	if err = do(tx); err != nil {
+	if err = do(ctx, tx); err != nil {
 		if rollbackErr := tx.Rollback(ctx); rollbackErr != nil {
 			log.Println(fmt.Errorf("tx.Rollback: %w", err).Error())
 		}

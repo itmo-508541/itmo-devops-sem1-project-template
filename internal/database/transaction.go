@@ -1,6 +1,8 @@
 package database
 
 import (
+	"context"
+
 	"github.com/jackc/pgx/v5"
 )
 
@@ -8,6 +10,6 @@ type transaction struct {
 	pgx.Tx
 }
 
-func (t *transaction) WithTransaction(do func(conn Connection) error) error {
-	return do(t)
+func (tx *transaction) WithTransaction(ctx context.Context, do TransactionCallback) error {
+	return do(ctx, tx)
 }

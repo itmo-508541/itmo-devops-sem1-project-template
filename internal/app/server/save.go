@@ -5,11 +5,10 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"project_sem/internal/app/price"
 	"project_sem/internal/reader"
 )
 
-func NewSaveHandler(repository *price.Repository) http.HandlerFunc {
+func NewSaveHandler(repository CsvReceiver) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var err error
 		var csv []byte

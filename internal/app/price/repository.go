@@ -48,7 +48,7 @@ func (r *Repository) AcceptCsv(
 	}
 
 	// Ревью 1: все нужно делать в транзакции
-	err = r.db.WithTransaction(ctx, func(conn database.Connection) error {
+	err = r.db.WithTransaction(ctx, func(ctx context.Context, conn database.Connection) error {
 		var exists int
 		for _, price := range input {
 			err := v.Struct(price)
@@ -121,7 +121,7 @@ func (r *Repository) AcceptCsv(
 
 func (r *Repository) FindByFilter(
 	parentCtx context.Context,
-	filter RequestFilter,
+	filter SqlFilter,
 ) (*[]PriceDTO, error) {
 	sql := "SELECT id, name, category, price, create_date FROM prices"
 	args, where, ok := filter.Where()

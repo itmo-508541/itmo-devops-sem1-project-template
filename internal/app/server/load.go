@@ -10,7 +10,7 @@ import (
 	"github.com/gocarina/gocsv"
 )
 
-func NewLoadHandler(repository *price.Repository) http.HandlerFunc {
+func NewLoadHandler(repository DataFinder) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var csv string
 		var err error
